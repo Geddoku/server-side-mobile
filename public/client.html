@@ -2,22 +2,21 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Client</title>
+    <title>client</title>
   </head>
   <body>
-    <h1>Watch Stream on client</h1>
+    <img src="">
+        <script>
+            // get img dom element
+            const img = document.querySelector('img');
 
-    <script src="/socket.io/socket.io.js"></script>
-	   <script>
-		     (function (d, io){
-			        'use strict'
-
-			           var io = io()
-
-			              io.on('play stream', function (image){
-				                  d.querySelector('#streaming').src = image
-			                     })
-		                })(document, io)
-	   </script>
+            const WS_URL = 'ws://localhost:5001';
+            const ws = new WebSocket(WS_URL);
+            ws.onopen = () => console.log(`Connected to ${WS_URL}`);
+            ws.onmessage = message => {
+                // set the base64 string to the src tag of the image
+                img.src = message.data;
+            }
+        </script>
   </body>
 </html>
