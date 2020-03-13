@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 const Course = require('../models/course');
-const User = require('../models/user');
 
 router.post('/addCourse', (req, res, next) => {
   const course = new Course({

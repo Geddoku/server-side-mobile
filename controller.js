@@ -3,6 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const pubDir = `${__dirname}/public`;
+const io = require('socket.io');
 
 const userRoutes = require('./server/routes/users');
 const courseRoutes = require('./server/routes/courses');
@@ -26,6 +28,15 @@ app.use((res, req, next) => {
   }
   next();
 });
+
+app
+  .get('/client', (req, res) => {
+    res.sendFile(`${pubDir}/client.html`)
+  })
+  .get('/streaming', (req, res) => {
+    res.sendFile(`${pubDir}/server.html`)
+  })
+
 
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);

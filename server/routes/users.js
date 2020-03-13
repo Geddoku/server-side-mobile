@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+const Course = require('../models/course');
 const auth = require('../middleware/auth');
 
 router.post('/register',
@@ -138,13 +139,25 @@ router.post(
   }
 );
 
-router.get('/currentUser', auth, async(req, res) => {
+router.get('/currentUser', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     res.json(user);
   } catch (e) {
     res.send({ message: "Error in Fetching user" });
   }
+});
+
+router.post('/createOwnCourse', async (req, res, next) => {
+  const course = new Course({
+    _id: new mongoose.Types.ObjectId,
+    title: req.body.title,
+    author: req.body.author,
+    content: req.body.content
+  });
+  course.save()
+    .then(result => res.status(200).json({ createdCourse: result }))
+    .catch(err => res.status(500).json({ error: err}));
 });
 
 router.get('/getAll', (req, res, next) => {
