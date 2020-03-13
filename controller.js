@@ -1,36 +1,24 @@
 const express = require('express');
 const app = express();
+const http = require('http').Server(app);
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const pubDir = `${__dirname}/public`;
-const io = require('socket.io');
+const io = require('socket.io')(http);
 const path = require('path');
 const WebSocket = require('ws');
 
 const userRoutes = require('./server/routes/users');
 const courseRoutes = require('./server/routes/courses');
 
-const WS_PORT = process.env.WS_PORT || 5001;
-
-const wsServer = new WebSocket.Server({ port: WS_PORT }, () =>
-      console.log(`WS server is listening at ws://localhost:${WS_PORT}`));
-
-let connectionClients = [];
-
-wsServer.on('connection', (ws, req) => {
-  console.log('Connected');
-  connectionClients.push(ws);
-  ws.on('message', data => {
-    connectionClients.forEach((ws, i) => {
-      if (ws.readyState === ws.OPEN) {
-        ws.send(data);
-      } else {
-        connectedClients.splice(i, 1);
-      }
+io.on('connection', (socket) => {
+    socket.on('stream', (image) => {
+        socket.broadcast.emit('stream',image);
     });
-  });
 });
+
+app.use(express.static(__dirname + '/public'));
 
 mongoose.connect('mongodb+srv://dbMOBILE:serverjs@mobile-server-rjy4g.mongodb.net/test?retryWrites=true&w=majority',
 {useNewUrlParser: true} );
@@ -76,6 +64,10 @@ app.use((error, req, res, next) => {
       message: error.message
     }
   });
+});
+
+app.get('/', (req, res) => {
+  res.sendFile('index.html');
 });
 
 module.exports = app;
